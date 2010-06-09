@@ -1,0 +1,14 @@
+% my $uri = $_[0]->{handler}->request->uri->clone;
+% $uri->path('/zap');
+% $uri->query_form({});
+<html>
+    <head>
+        <title></title>
+        <meta http-equiv="Content-type" content="text/html; charset=utf-8" />
+        <script type="text/javascript" src="/static/js/jquery.js"></script>
+        <link rel="stylesheet" href="/static/css/base.css">
+    <body>
+        <h1>hello</h1>
+        <a title="mcrwv" href="./?javascript:location.href='<%= $uri %>?url='+location.href">bookmarklet</a>
+    <body>
+</html>
