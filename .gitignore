@@ -3,3 +3,7 @@ Makefile
 blib
 inc
 pm_to_blib
+*.mp4
+*.mpeg
+*.DS_Store
+*.txt

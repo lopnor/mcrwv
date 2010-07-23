@@ -51,6 +51,7 @@ sub zap {
             $ffmpeg->output_file($mpg);
             $ffmpeg->options(
                 -r => 30,
+                -s => '1024×768',
                 '-sameq',
                 '-y',
             );
@@ -61,20 +62,41 @@ sub zap {
         my $mpeg = catfile($self->out,"$target.mpeg");
         system('cat '.join(' ',@mpg)." > $mpeg");
         unlink $_ for @mpg;
-        my $ffmpeg = FFmpeg::Command->new;
-        $ffmpeg->input_file($mpeg);
-        $ffmpeg->output_file($mp4);
-        $ffmpeg->options(
-            -vcodec => 'mpeg4',
-#            -vcodec => 'libx264',
-#            -vpre => 'hq',
-            -r => 30,
-            -acodec => 'aac',
-            '-y',
-        );
-        $ffmpeg->exec;
+        {
+            my $ffmpeg = FFmpeg::Command->new;
+            $ffmpeg->input_file($mpeg);
+            $ffmpeg->output_file($mp4);
+            $ffmpeg->options(
+#            -vcodec => 'mpeg4',
+                -vcodec => 'libx264',
+                -vpre => 'fastfirstpass',
+                -b => '1200k'
+                -pass => 1,
+                -acodec => 'aac',
+                '-y',
+            );
+            $ffmpeg->exec;
+            $ffmpeg->errstr and die $ffmpeg->errstr;
+        }
+        {
+            my $ffmpeg = FFmpeg::Command->new;
+            $ffmpeg->input_file($mpeg);
+            $ffmpeg->output_file($mp4);
+            $ffmpeg->options(
+#            -vcodec => 'mpeg4',
+                -vcodec => 'libx264',
+                -b => '1200k'
+                -vpre => 'hq',
+                -vpre => 'ipod320',
+                -pass => 2,
+                -acodec => 'aac',
+                '-y',
+            );
+            $ffmpeg->exec;
+            $ffmpeg->errstr and die $ffmpeg->errstr;
+        }
         unlink $mpeg;
-        return $mp4 unless $ffmpeg->errstr;
+        return $mp4;;
     }, $cb;
 }
 
